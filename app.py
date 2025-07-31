@@ -2,10 +2,8 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine
 from datetime import datetime
-import pyautogui
 import base64
 from io import BytesIO
-import os
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
@@ -81,19 +79,12 @@ def get_screenshot():
 # BOTÓN PARA CAPTURA DE PANTALLA
 # ========================
 if st.button("📷 Guardar captura de pantalla"):
-    # Verificar si el código está corriendo en Streamlit Cloud o local
-    if 'pyautogui' in globals():  # Solo si pyautogui está disponible (local)
-        archivo = f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-        pyautogui.screenshot(archivo)
-        st.success(f"Captura guardada como {archivo}")
-        st.image(archivo, caption="Vista actual")
-    else:
-        # En la nube (Streamlit Cloud)
-        st.markdown(f"""
-            <div style="display: flex; justify-content: center; align-items: center;">
-                <img src="{get_screenshot()}" alt="Captura de pantalla" width="400" />
-            </div>
-        """, unsafe_allow_html=True)
+    # En la nube (Streamlit Cloud)
+    st.markdown(f"""
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img src="{get_screenshot()}" alt="Captura de pantalla" width="400" />
+        </div>
+    """, unsafe_allow_html=True)
 
 # ========================
 # MOSTRAR TABLA DE DATOS
