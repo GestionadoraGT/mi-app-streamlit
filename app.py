@@ -5,6 +5,7 @@ from datetime import datetime
 import pyautogui
 import base64
 from io import BytesIO
+import os
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
@@ -81,18 +82,19 @@ def get_screenshot():
 # ========================
 if st.button("📷 Guardar captura de pantalla"):
     # Detectar si es local o en la nube
-    if "pyautogui" in locals():
-        archivo = f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-        pyautogui.screenshot(archivo)
-        st.success(f"Captura guardada como {archivo}")
-        st.image(archivo, caption="Vista actual")
-    else:
-        # En la nube, capturar desde el navegador
+    if os.environ.get("STREAMLIT_SERVER", "") == "true":
+        # Si está en la nube (Streamlit Cloud)
         st.markdown(f"""
             <div style="display: flex; justify-content: center; align-items: center;">
                 <img src="{get_screenshot()}" alt="Captura de pantalla" width="400" />
             </div>
         """, unsafe_allow_html=True)
+    else:
+        # Si está en local, usa pyautogui
+        archivo = f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        pyautogui.screenshot(archivo)
+        st.success(f"Captura guardada como {archivo}")
+        st.image(archivo, caption="Vista actual")
 
 # ========================
 # MOSTRAR TABLA DE DATOS
