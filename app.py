@@ -8,7 +8,7 @@ from datetime import datetime
 # ========================
 st.set_page_config(page_title="Semáforo de Cumplimiento", layout="centered")
 
-st.title("📊 Semáforo de Cumplimiento de Meta")
+st.title("📊 Cumplimiento de Meta de País")
 
 # ========================
 # CONEXIÓN A POSTGRESQL
