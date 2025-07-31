@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine
 from datetime import datetime
-import pyautogui
 import base64
 from io import BytesIO
 import os
