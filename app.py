@@ -2,8 +2,6 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine
 from datetime import datetime
-import base64
-from io import BytesIO
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
@@ -65,32 +63,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-# ========================
-# FUNCION PARA CREAR UNA IMAGEN Y DESCARGARLA
-# ========================
-def create_image():
-    img_data = """
-    <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">
-        <circle cx="75" cy="75" r="75" fill="{color}" />
-    </svg>
-    """.format(color=color)
-    img_buffer = BytesIO(img_data.encode())
-    return img_buffer
-
-# ========================
-# BOTÓN PARA DESCARGAR IMAGEN
-# ========================
-img_buffer = create_image()
-st.download_button(
-    label="📥 Descargar captura de semáforo",
-    data=img_buffer,
-    file_name=f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.svg",
-    mime="image/svg+xml"
-)
-
-# ========================
-# MOSTRAR TABLA DE DATOS
-# ========================
-with st.expander("Ver datos filtrados"):
-    st.dataframe(df)
