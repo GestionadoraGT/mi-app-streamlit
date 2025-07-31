@@ -13,12 +13,12 @@ META_OBJETIVO = 6868529.00  # Meta fija
 @st.cache_data
 def cargar_datos():
     engine = create_engine(DB_URL)
-    query = "SELECT * FROM pagos_mes WHERE tipo_cartera = 'Propia'"
+    query = "SELECT * FROM pagos_mes WHERE Tipo_Cartera = 'Propia'"
     df = pd.read_sql(query, engine)
     return df
 
 def calcular_cumplimiento(df):
-    total = df["monto"].sum()
+    total = df["Monto"].sum()
     porcentaje = (total / META_OBJETIVO) * 100
     return total, porcentaje
 
