@@ -67,24 +67,27 @@ st.markdown(
 )
 
 # ========================
-# FUNCION PARA CAPTURAR LA IMAGEN EN LA NUBE
+# FUNCION PARA CREAR UNA IMAGEN Y DESCARGARLA
 # ========================
-def get_screenshot():
-    screenshot = st.capture_screenshot()
-    img_buffer = BytesIO(screenshot)
-    img_data = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
-    return f"data:image/png;base64,{img_data}"
+def create_image():
+    img_data = """
+    <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150">
+        <circle cx="75" cy="75" r="75" fill="{color}" />
+    </svg>
+    """.format(color=color)
+    img_buffer = BytesIO(img_data.encode())
+    return img_buffer
 
 # ========================
-# BOTÓN PARA CAPTURA DE PANTALLA
+# BOTÓN PARA DESCARGAR IMAGEN
 # ========================
-if st.button("📷 Guardar captura de pantalla"):
-    # En la nube (Streamlit Cloud)
-    st.markdown(f"""
-        <div style="display: flex; justify-content: center; align-items: center;">
-            <img src="{get_screenshot()}" alt="Captura de pantalla" width="400" />
-        </div>
-    """, unsafe_allow_html=True)
+img_buffer = create_image()
+st.download_button(
+    label="📥 Descargar captura de semáforo",
+    data=img_buffer,
+    file_name=f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.svg",
+    mime="image/svg+xml"
+)
 
 # ========================
 # MOSTRAR TABLA DE DATOS
