@@ -3,6 +3,8 @@ import streamlit as st
 from sqlalchemy import create_engine
 from datetime import datetime
 import pyautogui
+import base64
+from io import BytesIO
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
@@ -66,13 +68,31 @@ st.markdown(
 )
 
 # ========================
+# FUNCION PARA CAPTURAR LA IMAGEN EN LA NUBE
+# ========================
+def get_screenshot():
+    screenshot = st.capture_screenshot()
+    img_buffer = BytesIO(screenshot)
+    img_data = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+    return f"data:image/png;base64,{img_data}"
+
+# ========================
 # BOTÓN PARA CAPTURA DE PANTALLA
 # ========================
 if st.button("📷 Guardar captura de pantalla"):
-    archivo = f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-    pyautogui.screenshot(archivo)
-    st.success(f"Captura guardada como {archivo}")
-    st.image(archivo, caption="Vista actual")
+    # Detectar si es local o en la nube
+    if "pyautogui" in locals():
+        archivo = f"semaforo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        pyautogui.screenshot(archivo)
+        st.success(f"Captura guardada como {archivo}")
+        st.image(archivo, caption="Vista actual")
+    else:
+        # En la nube, capturar desde el navegador
+        st.markdown(f"""
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <img src="{get_screenshot()}" alt="Captura de pantalla" width="400" />
+            </div>
+        """, unsafe_allow_html=True)
 
 # ========================
 # MOSTRAR TABLA DE DATOS
