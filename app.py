@@ -35,10 +35,12 @@ def calcular_cumplimiento(df):
     cumplimiento = (total_monto / META) * 100
 
     # Determinar el color del semáforo
-    if cumplimiento >= 85:
+    if cumplimiento >= 75:
         color = "green"
-    elif cumplimiento >= 60:
+    elif cumplimiento >= 50:
         color = "yellow"
+    elif cumplimiento >= 25:
+        color = "orange"
     else:
         color = "red"
     
