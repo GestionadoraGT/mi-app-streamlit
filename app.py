@@ -60,13 +60,8 @@ if st.button('Actualizar Datos'):
     ### 📈 Cumplimiento: **{cumplimiento:.2f}%**
     """)
 
-    st.markdown(
-        f"""
-        <div style="text-align: center;">
-            <div style="width: 150px; height: 150px; border-radius: 50%; background-color: {color}; margin: auto;"></div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Mostrar imagen del semáforo
+    st.image(f"imagenes/semaforo_{color}.png", use_column_width=True)
+    
 else:
     st.write("Haz clic en el botón 'Actualizar Datos' para cargar los datos más recientes.")
