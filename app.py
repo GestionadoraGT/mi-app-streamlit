@@ -61,7 +61,7 @@ if st.button('Actualizar Datos'):
     """)
 
     # Mostrar imagen del semáforo
-    st.image(f"imagenes/semaforo_{color}.png", use_column_width=True)
+    st.image(f"imagenes/semaforo_{color}.png", use_container_width=True)
     
 else:
     st.write("Haz clic en el botón 'Actualizar Datos' para cargar los datos más recientes.")
