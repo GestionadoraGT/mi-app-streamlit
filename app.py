@@ -79,6 +79,7 @@ with col1:
 with col2:
     ruta_imagen = f"imagenes/semaforo_{st.session_state['color']}.png"
     if os.path.exists(ruta_imagen):
-        st.image(ruta_imagen, width=120)
+        st.image(ruta_imagen, width=220)
     else:
         st.warning(f"No se encontró la imagen para el color **{st.session_state['color']}**")
+
