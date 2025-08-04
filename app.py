@@ -71,6 +71,9 @@ col1, col2 = st.columns([2, 1])
 
 with col1:
     st.markdown(f"""
+    ### 
+    ### 
+    ### 
     ### 📌 Meta: **{META:,.2f}**
     ### 💰 Recuperado: **{st.session_state['total_monto']:,.2f}**
     ### 📈 Cumplimiento: **{st.session_state['cumplimiento']:.2f}%**
@@ -82,4 +85,5 @@ with col2:
         st.image(ruta_imagen, width=220)
     else:
         st.warning(f"No se encontró la imagen para el color **{st.session_state['color']}**")
+
 
