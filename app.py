@@ -60,8 +60,21 @@ if st.button('Actualizar Datos'):
     ### 📈 Cumplimiento: **{cumplimiento:.2f}%**
     """)
 
-    # Mostrar imagen del semáforo
-    st.image(f"imagenes/semaforo_{color}.png", use_container_width=True)
+# ========================
+# MOSTRAR RESULTADOS Y SEMÁFORO
+# ========================
+col1, col2 = st.columns([2, 1])
+with col1:
+    st.markdown(f"""
+    ### 📌 Meta: **{META:,.2f}**
+    ### 💰 Recuperado: **{st.session_state['total_monto']:,.2f}**
+    ### 📈 Cumplimiento: **{st.session_state['cumplimiento']:.2f}%**
+    """)
+
+with col2:
+    ruta_imagen = f"imagenes/semaforo_{st.session_state['color']}.png"
+    if os.path.exists(ruta_imagen):
+        st.image(ruta_imagen, width=120)  # Tamaño ajustado para que no sea gigante
+    else:
+        st.warning(f"No se encontró la imagen para el color **{st.session_state['color']}**")
     
-else:
-    st.write("Haz clic en el botón 'Actualizar Datos' para cargar los datos más recientes.")
