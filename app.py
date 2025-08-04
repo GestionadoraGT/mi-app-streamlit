@@ -1,13 +1,12 @@
 import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine
-from datetime import datetime
+import os
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
 # ========================
 st.set_page_config(page_title="Semáforo de Cumplimiento", layout="centered")
-
 st.title("📊 Cumplimiento de Meta de País")
 
 # ========================
@@ -20,8 +19,21 @@ engine = create_engine(DB_URL)
 META = 6912854.00
 
 # ========================
+# INICIALIZAR VARIABLES EN SESSION STATE
+# ========================
+if "total_monto" not in st.session_state:
+    st.session_state["total_monto"] = 0.0
+if "cumplimiento" not in st.session_state:
+    st.session_state["cumplimiento"] = 0.0
+if "color" not in st.session_state:
+    st.session_state["color"] = "red"
+if "datos" not in st.session_state:
+    st.session_state["datos"] = pd.DataFrame()
+
+# ========================
 # FUNCIÓN PARA OBTENER DATOS ACTUALIZADOS
 # ========================
+@st.cache_data(ttl=300)
 def obtener_datos_actualizados():
     query = 'SELECT * FROM pagos_mes WHERE "Tipo_Cartera" = \'Propia\''
     df = pd.read_sql(query, engine)
@@ -34,7 +46,6 @@ def calcular_cumplimiento(df):
     total_monto = df["Monto"].sum()
     cumplimiento = (total_monto / META) * 100
 
-    # Determinar el color del semáforo
     if cumplimiento >= 75:
         color = "green"
     elif cumplimiento >= 50:
@@ -47,23 +58,17 @@ def calcular_cumplimiento(df):
     return total_monto, cumplimiento, color
 
 # ========================
-# BOTÓN PARA OBTENER DATOS ACTUALIZADOS
+# CARGA AUTOMÁTICA Y REFRESCO
 # ========================
-if st.button('Actualizar Datos'):
-    df = obtener_datos_actualizados()
-    total_monto, cumplimiento, color = calcular_cumplimiento(df)
-
-    # Mostrar resultados
-    st.markdown(f"""
-    ### 📌 Meta: **{META:,.2f}**
-    ### 💰 Recuperado: **{total_monto:,.2f}**
-    ### 📈 Cumplimiento: **{cumplimiento:.2f}%**
-    """)
+if st.button('🔄 Actualizar Datos') or st.session_state["total_monto"] == 0:
+    st.session_state["datos"] = obtener_datos_actualizados()
+    st.session_state["total_monto"], st.session_state["cumplimiento"], st.session_state["color"] = calcular_cumplimiento(st.session_state["datos"])
 
 # ========================
 # MOSTRAR RESULTADOS Y SEMÁFORO
 # ========================
 col1, col2 = st.columns([2, 1])
+
 with col1:
     st.markdown(f"""
     ### 📌 Meta: **{META:,.2f}**
@@ -74,7 +79,6 @@ with col1:
 with col2:
     ruta_imagen = f"imagenes/semaforo_{st.session_state['color']}.png"
     if os.path.exists(ruta_imagen):
-        st.image(ruta_imagen, width=120)  # Tamaño ajustado para que no sea gigante
+        st.image(ruta_imagen, width=120)
     else:
         st.warning(f"No se encontró la imagen para el color **{st.session_state['color']}**")
-    
