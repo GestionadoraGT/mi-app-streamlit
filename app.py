@@ -17,7 +17,7 @@ DB_URL = "postgresql+psycopg2://postgres:vZveOcrYtjNytGbiMrFJJordeIEfIBkQ@center
 engine = create_engine(DB_URL)
 
 # Meta fija
-META = 6868529.00
+META = 6912854.00
 
 # ========================
 # FUNCIÓN PARA OBTENER DATOS ACTUALIZADOS
