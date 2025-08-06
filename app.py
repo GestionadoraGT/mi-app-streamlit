@@ -59,6 +59,34 @@ def calcular_cumplimiento(df):
     return total_monto, cumplimiento, color
 
 # ========================
+# CÁLCULO AUTOMÁTICO DE DÍAS RESTANTES
+# ========================
+def calcular_dias_restantes():
+    hoy = datetime.now()
+    # último día del mes
+    if hoy.month == 12:
+        fin_mes = hoy.replace(day=31)
+    else:
+        fin_mes = (hoy.replace(day=1, month=hoy.month + 1) - timedelta(days=1))
+    
+    dias_restantes = (fin_mes - hoy).days + 1  # incluir hoy
+
+    # Lista de feriados fijos en Guatemala (día, mes)
+    feriados = [
+        (15, 8),  # 15 de agosto
+        (15, 9),  # 15 de septiembre
+        # Agrega más feriados si quieres
+    ]
+    
+    # Restar feriados dentro del rango
+    for dia, mes in feriados:
+        fecha_feriado = datetime(hoy.year, mes, dia)
+        if hoy <= fecha_feriado <= fin_mes:
+            dias_restantes -= 1
+
+    return dias_restantes
+
+# ========================
 # CARGA AUTOMÁTICA Y REFRESCO
 # ========================
 if st.button('🔄 Actualizar Datos') or st.session_state["total_monto"] == 0:
@@ -66,24 +94,10 @@ if st.button('🔄 Actualizar Datos') or st.session_state["total_monto"] == 0:
     st.session_state["total_monto"], st.session_state["cumplimiento"], st.session_state["color"] = calcular_cumplimiento(st.session_state["datos"])
 
 # ========================
-# CALCULAR DÍAS RESTANTES HASTA FIN DE MES
-# ========================
-def calcular_dias_restantes():
-    hoy = datetime.now()
-    fin_mes = hoy.replace(day=1, month=hoy.month+1) - timedelta(days=1)
-    dias_restantes = (fin_mes - hoy).days + 1  # Sumar 1 para incluir hoy
-    
-    # Restar el descanso del 15 de agosto si aplica
-    if hoy.month == 8 and hoy.day >= 15:
-        dias_restantes -= 1
-    
-    return dias_restantes
-
-dias_restantes = calcular_dias_restantes()
-
-# ========================
 # MOSTRAR RESULTADOS Y SEMÁFORO
 # ========================
+dias_restantes = calcular_dias_restantes()
+
 col1, col2 = st.columns([2, 1])
 
 with col1:
@@ -92,6 +106,7 @@ with col1:
     ### 📌 Meta: **{META:,.2f}**
     ### 💰 Recuperado: **{st.session_state['total_monto']:,.2f}**
     ### 📈 Cumplimiento: **{st.session_state['cumplimiento']:.2f}%**
+    ### 📅 Días Restantes: **{dias_restantes} hábiles**
     """)
 
 with col2:
