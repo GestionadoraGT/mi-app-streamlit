@@ -59,32 +59,36 @@ def calcular_cumplimiento(df):
     return total_monto, cumplimiento, color
 
 # ========================
-# CÁLCULO AUTOMÁTICO DE DÍAS RESTANTES
+# CÁLCULO DE DÍAS HÁBILES RESTANTES (Lunes-Viernes menos feriados)
 # ========================
 def calcular_dias_restantes():
     hoy = datetime.now()
-    # último día del mes
+
+    # Último día del mes
     if hoy.month == 12:
         fin_mes = hoy.replace(day=31)
     else:
         fin_mes = (hoy.replace(day=1, month=hoy.month + 1) - timedelta(days=1))
-    
-    dias_restantes = (fin_mes - hoy).days + 1  # incluir hoy
 
     # Lista de feriados fijos en Guatemala (día, mes)
-    feriados = [
-        (15, 8),  # 15 de agosto
-        (15, 9),  # 15 de septiembre
-        # Agrega más feriados si quieres
+    feriados_fijos = [
+        (15, 8),  # Asunción de la Virgen - 15 agosto
+        (15, 9),  # Independencia - 15 septiembre
+        # Agregar más feriados aquí según sea necesario
     ]
-    
-    # Restar feriados dentro del rango
-    for dia, mes in feriados:
-        fecha_feriado = datetime(hoy.year, mes, dia)
-        if hoy <= fecha_feriado <= fin_mes:
-            dias_restantes -= 1
 
-    return dias_restantes
+    # Convertir feriados a fechas del año actual
+    feriados = [datetime(hoy.year, mes, dia) for dia, mes in feriados_fijos]
+
+    # Contar días hábiles restantes excluyendo feriados
+    dias_habiles = 0
+    fecha_actual = hoy
+    while fecha_actual <= fin_mes:
+        if fecha_actual.weekday() < 5 and fecha_actual not in feriados:  # Lunes=0 ... Viernes=4
+            dias_habiles += 1
+        fecha_actual += timedelta(days=1)
+
+    return dias_habiles
 
 # ========================
 # CARGA AUTOMÁTICA Y REFRESCO
