@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine
 import os
+from datetime import datetime, timedelta
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
@@ -65,13 +66,29 @@ if st.button('🔄 Actualizar Datos') or st.session_state["total_monto"] == 0:
     st.session_state["total_monto"], st.session_state["cumplimiento"], st.session_state["color"] = calcular_cumplimiento(st.session_state["datos"])
 
 # ========================
+# CALCULAR DÍAS RESTANTES HASTA FIN DE MES
+# ========================
+def calcular_dias_restantes():
+    hoy = datetime.now()
+    fin_mes = hoy.replace(day=1, month=hoy.month+1) - timedelta(days=1)
+    dias_restantes = (fin_mes - hoy).days + 1  # Sumar 1 para incluir hoy
+    
+    # Restar el descanso del 15 de agosto si aplica
+    if hoy.month == 8 and hoy.day >= 15:
+        dias_restantes -= 1
+    
+    return dias_restantes
+
+dias_restantes = calcular_dias_restantes()
+
+# ========================
 # MOSTRAR RESULTADOS Y SEMÁFORO
 # ========================
 col1, col2 = st.columns([2, 1])
 
 with col1:
     st.markdown(f"""
-    ### 
+    ###  
     ### 📌 Meta: **{META:,.2f}**
     ### 💰 Recuperado: **{st.session_state['total_monto']:,.2f}**
     ### 📈 Cumplimiento: **{st.session_state['cumplimiento']:.2f}%**
@@ -83,6 +100,3 @@ with col2:
         st.image(ruta_imagen, width=220)
     else:
         st.warning(f"No se encontró la imagen para el color **{st.session_state['color']}**")
-
-
-
