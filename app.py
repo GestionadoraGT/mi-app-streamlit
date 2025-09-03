@@ -59,12 +59,14 @@ def obtener_datos_actualizados():
         return pd.DataFrame()
     
     try:
+        from sqlalchemy import text
+        
         # Verificar si la tabla existe
-        query_verificar = """
+        query_verificar = text("""
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_name = 'pagos_mes'
-        """
+        """)
         tablas = pd.read_sql(query_verificar, engine)
         
         if tablas.empty:
@@ -72,7 +74,7 @@ def obtener_datos_actualizados():
             return pd.DataFrame()
         
         # Obtener datos
-        query = 'SELECT * FROM pagos_mes WHERE "Tipo_Cartera" = \'Propia\''
+        query = text('SELECT * FROM pagos_mes WHERE "Tipo_Cartera" = \'Propia\'')
         df = pd.read_sql(query, engine)
         
         if df.empty:
