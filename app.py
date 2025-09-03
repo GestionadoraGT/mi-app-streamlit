@@ -179,7 +179,6 @@ if not st.session_state["datos"].empty:
     with col1:
         st.markdown(f"""
         ###
-        ###
         ### 📌 Meta: **Q{META:,.2f}**
         ### 💰 Recuperado: **Q{st.session_state['total_monto']:,.2f}**
         ### 📈 Cumplimiento: **{st.session_state['cumplimiento']:.2f}%**
@@ -195,7 +194,6 @@ if not st.session_state["datos"].empty:
 
     with st.expander("📊 Detalles de los Datos"):        
         st.write(f"**Última actualización:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        st.dataframe(st.session_state["datos"].head())
 
 else:
     st.info("📋 No hay datos disponibles.")
