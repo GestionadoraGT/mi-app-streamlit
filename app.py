@@ -15,11 +15,11 @@ st.title("📊 Cumplimiento de Meta de País")
 # ========================
 # CONEXIÓN A POSTGRESQL
 # ========================
-DB_URL = "postgresql+psycopg2://postgres:vZveOcrYtjNytGbiMrFJJordeIEfIBkQ@centerbeam.proxy.rlwy.net:48362/railway"
+DB_URL = "postgresql+psycopg2://neondb_owner:npg_3nHTy8MfYejc@ep-patient-union-abhem53z-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require"
 engine = create_engine(DB_URL)
 
 # Meta fija
-META = 6912854.00
+META = 6,912,843.60
 
 # ========================
 # INICIALIZAR VARIABLES EN SESSION STATE
