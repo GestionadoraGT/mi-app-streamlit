@@ -1,33 +1,15 @@
-import streamlit as st
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 
-# ========================
-# CONFIGURACIÓN
-# ========================
-st.set_page_config(page_title="Prueba Conexión DB", layout="centered")
-st.title("🔗 Test conexión PostgreSQL")
+# 🔗 Conexión (ajusta tus credenciales reales)
+DB_URL = "postgresql+psycopg2://<USUARIO>:<PASSWORD>@<HOST>/<DB>"
+engine = create_engine(DB_URL)
 
-DB_URL = "postgresql+psycopg2://neondb_owner:npg_3nHTy8MfYejc@ep-patient-union-abhem53z-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require"
-
-# ========================
-# PROBAR CONEXIÓN
-# ========================
+# 📥 Leer datos de la tabla pagos_mes
 try:
-    engine = create_engine(DB_URL)
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
-    st.success("✅ Conexión exitosa con la base de datos.")
-
-    # Mostrar tablas disponibles
-    query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
-    tablas = pd.read_sql(query, engine)
-
-    if not tablas.empty:
-        st.write("**Tablas encontradas en la base:**")
-        st.dataframe(tablas)
-    else:
-        st.warning("⚠️ No hay tablas en el esquema 'public'.")
-
+    df = pd.read_sql("SELECT * FROM pagos_mes", engine)
+    print("✅ Registros obtenidos de pagos_mes:")
+    print(df.head())  # muestra los primeros registros
+    print(f"Total de registros: {len(df)}")
 except Exception as e:
-    st.error(f"❌ Error conectando a la base de datos: {e}")
+    print("❌ Error al consultar la tabla:", e)
