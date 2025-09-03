@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import os
 # 🔹 Desactivar watcher de archivos de Streamlit
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
