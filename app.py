@@ -186,8 +186,7 @@ if not st.session_state["datos"].empty:
         st.progress(min(st.session_state["cumplimiento"]/100, 1.0))
 
     with col2:
-        semaforo_emoji = {"green": "🟢", "yellow": "🟡", "orange": "🟠", "red": "🔴"}
-        st.markdown(f"<div style='text-align: center; font-size: 80px;'>{semaforo_emoji[st.session_state['color']]}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align: center; font-size: 80px;'></div>", unsafe_allow_html=True)
         ruta_imagen = f"imagenes/semaforo_{st.session_state['color']}.png"
         if os.path.exists(ruta_imagen):
             st.image(ruta_imagen, width=220)
