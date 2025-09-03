@@ -1,10 +1,11 @@
 import pandas as pd
 import streamlit as st
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text   # 👈 Importa también text
 import os
+from datetime import datetime, timedelta
+
 # 🔹 Desactivar watcher de archivos de Streamlit
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
-from datetime import datetime, timedelta
 
 # ========================
 # CONFIGURACIÓN STREAMLIT
@@ -33,7 +34,7 @@ def crear_conexion():
 engine = crear_conexion()
 
 # Meta fija
-META = 6912843.60  # Corregido: era una tupla, ahora es un float
+META = 6912843.60
 
 # ========================
 # INICIALIZAR VARIABLES EN SESSION STATE
@@ -59,8 +60,6 @@ def obtener_datos_actualizados():
         return pd.DataFrame()
     
     try:
-        from sqlalchemy import text
-        
         # Verificar si la tabla existe
         query_verificar = text("""
         SELECT table_name 
@@ -137,29 +136,26 @@ def calcular_dias_restantes():
 
     # Lista de feriados fijos en Guatemala (día, mes)
     feriados_fijos = [
-        (15, 8),  # Asunción de la Virgen - 15 agosto
-        (15, 9),  # Independencia - 15 septiembre
-        (20, 10), # Revolución de 1944 - 20 octubre
-        (1, 11),  # Día de Todos los Santos - 1 noviembre
-        (24, 12), # Nochebuena - 24 diciembre
-        (25, 12), # Navidad - 25 diciembre
-        (31, 12), # Fin de año - 31 diciembre
-        # Agregar más feriados aquí según sea necesario
+        (15, 8),  # Asunción de la Virgen
+        (15, 9),  # Independencia
+        (20, 10), # Revolución
+        (1, 11),  # Todos los Santos
+        (24, 12), # Nochebuena
+        (25, 12), # Navidad
+        (31, 12), # Fin de año
     ]
 
-    # Convertir feriados a fechas del año actual
     feriados = []
     for dia, mes in feriados_fijos:
         try:
             feriados.append(datetime(hoy.year, mes, dia))
         except ValueError:
-            continue  # Ignorar fechas inválidas
+            continue
 
-    # Contar días hábiles restantes excluyendo feriados
     dias_habiles = 0
-    fecha_actual = hoy + timedelta(days=1)  # Empezar desde mañana
+    fecha_actual = hoy + timedelta(days=1)
     while fecha_actual <= fin_mes:
-        if fecha_actual.weekday() < 5 and fecha_actual not in feriados:  # Lunes=0 ... Viernes=4
+        if fecha_actual.weekday() < 5 and fecha_actual not in feriados:
             dias_habiles += 1
         fecha_actual += timedelta(days=1)
 
@@ -169,12 +165,10 @@ def calcular_dias_restantes():
 # INTERFAZ PRINCIPAL
 # ========================
 
-# Verificar conexión
 if engine is None:
     st.error("❌ No se pudo conectar a la base de datos. Verifica tu conexión.")
     st.stop()
 
-# Botones de control
 col_btn1, col_btn2 = st.columns(2)
 
 with col_btn1:
@@ -222,11 +216,9 @@ if not st.session_state["datos"].empty:
         ### 📅 Días Restantes: **{dias_restantes} hábiles**
         """)
         
-        # Barra de progreso
         st.progress(min(st.session_state['cumplimiento'] / 100, 1.0))
 
     with col2:
-        # Semáforo con emojis como fallback
         semaforo_emoji = {
             "green": "🟢",
             "yellow": "🟡", 
@@ -240,14 +232,10 @@ if not st.session_state["datos"].empty:
         </div>
         """, unsafe_allow_html=True)
         
-        # Intentar cargar imagen si existe
         ruta_imagen = f"imagenes/semaforo_{st.session_state['color']}.png"
         if os.path.exists(ruta_imagen):
             st.image(ruta_imagen, width=220)
 
-    # ========================
-    # INFORMACIÓN ADICIONAL
-    # ========================
     with st.expander("📊 Detalles de los Datos"):
         st.write(f"**Total de registros:** {len(st.session_state['datos'])}")
         st.write(f"**Última actualización:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -260,7 +248,7 @@ else:
     
     if st.button("🔍 Verificar Tablas Disponibles"):
         try:
-            query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+            query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
             tablas = pd.read_sql(query, engine)
             if not tablas.empty:
                 st.write("**Tablas disponibles:**")
