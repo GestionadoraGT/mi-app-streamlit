@@ -3,6 +3,10 @@ import streamlit as st
 from sqlalchemy import create_engine, text
 import os
 from datetime import datetime, timedelta
+import pytz
+
+# Definir zona horaria de Guatemala
+zona_gt = pytz.timezone("America/Guatemala")
 
 # 🔹 Desactivar watcher de archivos de Streamlit
 os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
