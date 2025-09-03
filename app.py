@@ -24,7 +24,7 @@ def crear_conexion():
         engine = create_engine(DB_URL)
         # Probar la conexión
         with engine.connect() as conn:
-            conn.execute("SELECT 1")
+            conn.execute(text("SELECT 1"))
         return engine
     except Exception as e:
         st.error(f"Error conectando a la base de datos: {e}")
@@ -185,7 +185,7 @@ with col_btn2:
         if engine:
             try:
                 with engine.connect() as conn:
-                    conn.execute("SELECT 1")
+                    conn.execute(text("SELECT 1"))
                 st.success("✅ Conexión exitosa")
             except Exception as e:
                 st.error(f"❌ Error de conexión: {e}")
