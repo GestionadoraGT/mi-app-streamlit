@@ -25,8 +25,7 @@ DB_URL = "postgresql+psycopg2://neondb_owner:npg_3nHTy8MfYejc@ep-patient-union-a
 @st.cache_resource
 def crear_conexion():
     try:
-        engine = create_engine(DB_URL)
-        # Probar conexión mínima
+        engine = create_engine(DB_URL, pool_pre_ping=True)
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         return engine
@@ -60,31 +59,29 @@ if "datos" not in st.session_state:
 def obtener_datos_actualizados():
     if engine is None:
         return pd.DataFrame()
-    
     try:
-        # Verificar si la tabla existe
-        tablas = pd.read_sql(
-            "SELECT table_name FROM information_schema.tables WHERE table_name = 'pagos_mes'",
-            engine
-        )
-        
-        if tablas.empty:
-            st.warning("⚠️ La tabla 'pagos_mes' no existe en la base.")
-            return pd.DataFrame()
-        
-        # Traer solo Tipo_Cartera = 'Propia'
-        df = pd.read_sql('SELECT * FROM pagos_mes WHERE "Tipo_Cartera" = \'Propia\'', engine)
-        
-        if df.empty:
-            st.warning("⚠️ No hay registros con Tipo_Cartera = 'Propia'")
-            return pd.DataFrame()
-        
-        if "Monto" not in df.columns:
-            st.error("❌ No existe columna 'Monto'. Columnas disponibles:")
-            st.write(df.columns.tolist())
-            return pd.DataFrame()
-        
-        return df
+        with engine.connect() as conn:  # conexión segura y cerrada automáticamente
+            # Verificar si la tabla existe
+            tablas = pd.read_sql(
+                "SELECT table_name FROM information_schema.tables WHERE table_name = 'pagos_mes'",
+                conn
+            )
+            if tablas.empty:
+                st.warning("⚠️ La tabla 'pagos_mes' no existe en la base.")
+                return pd.DataFrame()
+            
+            # Traer solo Tipo_Cartera = 'Propia'
+            df = pd.read_sql('SELECT * FROM pagos_mes WHERE "Tipo_Cartera" = \'Propia\'', conn)
+            if df.empty:
+                st.warning("⚠️ No hay registros con Tipo_Cartera = 'Propia'")
+                return pd.DataFrame()
+            
+            if "Monto" not in df.columns:
+                st.error("❌ No existe columna 'Monto'. Columnas disponibles:")
+                st.write(df.columns.tolist())
+                return pd.DataFrame()
+            
+            return df
     except Exception as e:
         st.error(f"❌ Error consultando datos: {e}")
         return pd.DataFrame()
@@ -120,7 +117,7 @@ def calcular_cumplimiento(df):
 # CÁLCULO DE DÍAS RESTANTES
 # ========================
 def calcular_dias_restantes():
-    hoy = datetime.now()
+    hoy = datetime.now(zona_gt)
     if hoy.month == 12:
         fin_mes = hoy.replace(day=31)
     else:
@@ -130,7 +127,7 @@ def calcular_dias_restantes():
         (15, 8), (15, 9), (20, 10), (1, 11),
         (24, 12), (25, 12), (31, 12)
     ]
-    feriados = [datetime(hoy.year, m, d) for d, m in feriados_fijos]
+    feriados = [datetime(hoy.year, m, d, tzinfo=zona_gt) for d, m in feriados_fijos]
 
     dias_habiles = 0
     fecha_actual = hoy + timedelta(days=1)
@@ -182,7 +179,7 @@ if not st.session_state["datos"].empty:
 
     with col1:
         st.markdown(f"""
-        ###
+        ###  
         ### 📌 Meta: **Q{META:,.2f}**
         ### 💰 Recuperado: **Q{st.session_state['total_monto']:,.2f}**
         ### 📈 Cumplimiento: **{st.session_state['cumplimiento']:.2f}%**
@@ -197,13 +194,14 @@ if not st.session_state["datos"].empty:
             st.image(ruta_imagen, width=220)
 
     with st.expander("📊 Detalles de los Datos"):        
-        st.write(f"**Última actualización:** {datetime.now().strftime('%Y-%m-%d')}")
+        st.write(f"**Última actualización:** {datetime.now(zona_gt).strftime('%Y-%m-%d %H:%M:%S')}")
 
 else:
     st.info("📋 No hay datos disponibles.")
     if st.button("🔍 Verificar Tablas Disponibles"):
         try:
-            tablas = pd.read_sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'", engine)
+            with engine.connect() as conn:
+                tablas = pd.read_sql("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'", conn)
             st.dataframe(tablas if not tablas.empty else pd.DataFrame(["No hay tablas"]))
         except Exception as e:
             st.error(f"Error verificando tablas: {e}")
