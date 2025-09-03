@@ -197,7 +197,7 @@ if not st.session_state["datos"].empty:
             st.image(ruta_imagen, width=220)
 
     with st.expander("📊 Detalles de los Datos"):        
-        st.write(f"**Última actualización:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        st.write(f"**Última actualización:** {datetime.now().strftime('%Y-%m-%d')}")
 
 else:
     st.info("📋 No hay datos disponibles.")
